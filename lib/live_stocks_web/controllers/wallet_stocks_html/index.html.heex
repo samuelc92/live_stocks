@@ -1,0 +1,36 @@
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold mb-6">Add Stock</h1>
+
+  <.simple_form :let={f} class="mb-6" for={@changeset} action={~p"/wallet/#{@wallet_id}/stocks"}>
+    <div class="flex gap-2">
+      <.input
+        field={f[:stock]}
+        type="text"
+        placeholder="Enter stock"
+        class="flex-1 px-3 py-2 border rounded"
+        required
+      />
+
+      <.input
+        field={f[:description]}
+        type="text"
+        placeholder="Enter description"
+        class="flex-1 px-3 py-2 border rounded"
+        required
+      />
+
+      <.input
+        field={f[:quantity]}
+        type="number"
+        step="1"
+        placeholder="Enter quantity"
+        class="flex-1 px-3 py-2 border rounded"
+        required
+      />
+
+      <.button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        Add
+      </.button>
+    </div>
+  </.simple_form>
+</div>

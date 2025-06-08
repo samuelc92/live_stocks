@@ -1,0 +1,57 @@
+<div class="flex h-screen bg-gray-100">
+  <nav class="bg-gray-800 w-64 h-full fixed left-0 top-0">
+    <div class="p-4">
+      <h2 class="text-white text-xl font-semibold mb-6">Live Stocks</h2>
+      <ul class="space-y-2">
+        <li>
+          <.link
+            navigate={~p"/"}
+            class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
+          >
+            Home
+          </.link>
+        </li>
+        <li>
+          <.link
+            navigate={~p"/wallet/1"}
+            class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
+          >
+            Wallet
+          </.link>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- <header class="px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+      <div class="flex items-center gap-4">
+        <a href="/">
+          <img src={~p"/images/logo.svg"} width="36" />
+        </a>
+        <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
+          v{Application.spec(:phoenix, :vsn)}
+        </p>
+      </div>
+      <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
+        <a href="https://twitter.com/elixirphoenix" class="hover:text-zinc-700">
+          @elixirphoenix
+        </a>
+        <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
+          GitHub
+        </a>
+        <a
+          href="https://hexdocs.pm/phoenix/overview.html"
+          class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80"
+        >
+          Get Started <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </header> -->
+  <main class="flex-1 ml-64 p-8">
+    <div class="container mx-auto">
+      <.flash_group flash={@flash} />
+      {@inner_content}
+    </div>
+  </main>
+</div>

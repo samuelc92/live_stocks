@@ -1,0 +1,72 @@
+<div class="container mx-auto mt-10">
+<div class="max-w-3xl p-6 bg-white rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold mb-6">My Wallet</h1>
+
+  <div class="mb-8 p-6 bg-gray-100 rounded-lg">
+    <h2 class="text-lg font-semibold mb-2">Current Balance</h2>
+    <p class="text-3xl font-bold text-green-600 items-end">
+      {currency_to_str(@wallet.balance)}
+    </p>
+  </div>
+  </div>
+
+  <.simple_form :let={f} class="mb-6" for={@changeset} action={~p"/wallet/#{@wallet}"}>
+    <div class="flex gap-2">
+      <.input
+        field={f[:balance]}
+        type="number"
+        step="0.01"
+        placeholder="Enter amount"
+        class="flex-1 px-3 py-2 border rounded"
+        required
+      />
+
+      <.button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        Edit
+      </.button>
+    </div>
+  </.simple_form>
+
+  <div>
+    <h2 class="text-lg font-semibold mb-2">List of Stocks</h2>
+    <table class="w-full border-collapse bg-white shadow rounded-lg overflow-hidden">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Stock</th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Desc.</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Qtd</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <%= for stock <- @wallet.stocks do %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm font-medium text-blue-600">{stock.stock}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{stock.description}</td>
+            <td class="px-6 py-4 text-sm text-gray-600 text-right">
+              {Integer.to_string(stock.quantity)}
+            </td>
+            <td class="px-6 py-4">
+              <.link
+                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                href={~p"/wallet/#{@wallet}/stocks/#{stock}"}
+                method="get"
+              >
+                Edit
+              </.link>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="mt-4 flex justify-end">
+      <.link
+        href={~p"/wallet/#{@wallet}/stocks/new"}
+        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 inline-flex items-center"
+      >
+        Add Stock
+      </.link>
+    </div>
+  </div>
+</div>
