@@ -20,7 +20,10 @@ defmodule LiveStocksWeb.HomeLive do
       </div>
 
       <div class="flex justify-center mt-6">
-        <button phx-click="refresh" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button
+          phx-click="refresh"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
           Refresh Data
         </button>
       </div>
@@ -30,26 +33,35 @@ defmodule LiveStocksWeb.HomeLive do
 
   def mount(_params, _session, socket) do
     wallet = WalletService.get_wallet!(1)
-    case MarketStackClient.fetch_latest_stock_data("GOOGL") do
+    {:ok, pid} = Currency.start_link()
+
+    {:ok,
+     socket
+     |> assign(:data, build_balance_data(pid, "GOOGL", wallet.balance))
+     |> assign(:current_pid, pid)}
+  end
+
+  def handle_event("refresh", _params, socket) do
+    {:noreply, update(socket, :balance, &(&1 + 1))}
+  end
+
+  defp build_balance_data(pid, stock, wallet_balance) do
+    case MarketStackClient.fetch_latest_stock_data(stock) do
       {:ok, data} ->
-        {:ok, pid} = Currency.start_link()
         case Currency.convert(pid, "USD") do
           {:ok, result} ->
             sek_value = Decimal.round(Decimal.from_float(data.close * result["SEK"]), 2)
-            {:ok, assign(socket, :data, %{balance: wallet.balance, total_stocks: sek_value})}
+            %{balance: wallet_balance, total_stocks: sek_value}
+
           {:error, reason} ->
             IO.inspect(reason)
-            {:ok, assign(socket, :data, %{balance: wallet.balance, total_stocks: 0})}
+            %{balance: wallet_balance, total_stocks: 0}
         end
 
       {:error, reason} ->
         # Handle the error
         IO.inspect(reason)
-        {:ok, assign(socket, :data, %{balance: wallet.balance, total_stocks: 0})}
+        %{balance: wallet_balance, total_stocks: 0}
     end
-  end
-
-  def handle_event("refresh", _params, socket) do
-    {:noreply, update(socket, :balance, &(&1 + 1))}
   end
 end
