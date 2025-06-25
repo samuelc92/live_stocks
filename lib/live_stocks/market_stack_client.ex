@@ -16,6 +16,10 @@ defmodule LiveStocks.MarketStackClient do
 
         {:ok, hd(data["data"])}
 
+      {:ok, %HTTPoison.Response{status_code: 429}} ->
+        IO.inspect("Error: Market stack usage limit")
+        {:error, "usage_limit"}
+
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end

@@ -3,6 +3,7 @@ defmodule LiveStocksWeb.HomeLive do
   alias LiveStocks.WalletService
   alias LiveStocks.MarketStackClient
   alias LiveStocks.Currency
+  alias LiveStocks.StockService
 
   def render(assigns) do
     ~H"""
@@ -35,9 +36,23 @@ defmodule LiveStocksWeb.HomeLive do
     wallet = WalletService.get_wallet!(1)
     {:ok, pid} = Currency.start_link()
 
+    tasks =
+      wallet.stocks
+      |> Enum.map(fn stock ->
+        Task.async(fn ->
+          StockService.build_balance_data(pid, stock.stock, stock.quantity)
+        end)
+      end)
+
+    stock_results = Task.await_many(tasks, 10_000)
+
+    total_stocks_value =
+      stock_results
+      |> Enum.reduce(Decimal.new(0), fn x, acc -> Decimal.add(x.total_stock_value, acc) end)
+
     {:ok,
      socket
-     |> assign(:data, build_balance_data(pid, "GOOGL", wallet.balance))
+     |> assign(:data, %{balance: wallet.balance, total_stocks: total_stocks_value})
      |> assign(:current_pid, pid)}
   end
 
@@ -45,23 +60,27 @@ defmodule LiveStocksWeb.HomeLive do
     {:noreply, update(socket, :balance, &(&1 + 1))}
   end
 
-  defp build_balance_data(pid, stock, wallet_balance) do
+  # TODO: Delete
+  defp build_balance_data(pid, stock, stock_qty) do
     case MarketStackClient.fetch_latest_stock_data(stock) do
       {:ok, data} ->
-        case Currency.convert(pid, "USD") do
+        case Currency.convert(pid, data.price_currency) do
           {:ok, result} ->
-            sek_value = Decimal.round(Decimal.from_float(data.close * result["SEK"]), 2)
-            %{balance: wallet_balance, total_stocks: sek_value}
+            sek_value =
+              Decimal.round(Decimal.from_float(data.close * result["SEK"]), 2)
+
+            IO.inspect("#{stock}: #{sek_value}")
+            %{total_stock_value: sek_value |> Decimal.mult(stock_qty)}
 
           {:error, reason} ->
             IO.inspect(reason)
-            %{balance: wallet_balance, total_stocks: 0}
+            %{total_stock_value: 0}
         end
 
       {:error, reason} ->
         # Handle the error
         IO.inspect(reason)
-        %{balance: wallet_balance, total_stocks: 0}
+        %{total_stock_value: 0}
     end
   end
 end

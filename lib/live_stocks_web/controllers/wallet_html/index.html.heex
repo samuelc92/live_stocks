@@ -1,13 +1,13 @@
 <div class="container mx-auto mt-10">
-<div class="max-w-3xl p-6 bg-white rounded-lg shadow-lg">
-  <h1 class="text-2xl font-bold mb-6">My Wallet</h1>
+  <div class="max-w-3xl p-6 bg-white rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold mb-6">My Wallet</h1>
 
-  <div class="mb-8 p-6 bg-gray-100 rounded-lg">
-    <h2 class="text-lg font-semibold mb-2">Current Balance</h2>
-    <p class="text-3xl font-bold text-green-600 items-end">
-      {currency_to_str(@wallet.balance)}
-    </p>
-  </div>
+    <div class="mb-8 p-6 bg-gray-100 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">Current Balance</h2>
+      <p class="text-3xl font-bold text-green-600 items-end">
+        {currency_to_str(@wallet.balance)}
+      </p>
+    </div>
   </div>
 
   <.simple_form :let={f} class="mb-6" for={@changeset} action={~p"/wallet/#{@wallet}"}>
@@ -62,7 +62,7 @@
 
     <div class="mt-4 flex justify-end">
       <.link
-        href={~p"/wallet/#{@wallet}/stocks/new"}
+        href={~p"/wallet/#{@wallet}/stocks"}
         class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 inline-flex items-center"
       >
         Add Stock
